@@ -1,0 +1,16 @@
+"0","library(dplyr)
+library(ggplot2)
+
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(fivethirtyeight)
+library(ggplot2)
+library(tibble)
+
+
+library(readxl)
+midprojectpart2 <- read_excel(""~/projectpart2.xlsx"")
+"
+"2","Error: `path` does not exist: ‘~/projectpart2.xlsx’
+"

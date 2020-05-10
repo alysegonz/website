@@ -1,0 +1,23 @@
+getwd()
+
+install.packages("blogdown")
+blogdown::install_hugo()
+blogdown::new_site(theme="nurlansu/hugo-sustain")
+
+blogdown::serve_site()
+
+file.copy("Headshot copy.JPG", "img")
+
+blogdown::serve_site()
+
+blogdown::build_site()
+
+
+cd ~/Desktop/website
+
+git init 
+git add .
+git commit -m 
+git remote add origin https://github.com/alysegonz/website.git 
+git push origin master
+

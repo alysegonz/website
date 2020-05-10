@@ -1,0 +1,25 @@
+"0","midprojectpart1 <- midprojectpart1 %>%
+  pivot_longer(c(""F"",""M""),names_to = ""Sex"",values_to = ""GPA"", values_drop_na=T ) %>%
+  glimpse()
+"
+"1","Observations: 55
+"
+"1","Variables: 6
+"
+"1","$ ID         [3m[38;5;246m<dbl>[39m[23m 1, 2, 3, 4, 5, 6…
+"
+"1",""
+"1","$ Accept     [3m[38;5;246m<chr>[39m[23m ""D"", ""A"", ""A"", ""…
+"
+"1",""
+"1","$ Acceptance [3m[38;5;246m<dbl>[39m[23m 0, 1, 1, 1, 1, 1…
+"
+"1",""
+"1","$ BCPM       [3m[38;5;246m<dbl>[39m[23m 3.59, 3.75, 3.24…
+"
+"1",""
+"1","$ Sex        [3m[38;5;246m<chr>[39m[23m ""F"", ""M"", ""F"", ""…
+"
+"1",""
+"1","$ GPA        [3m[38;5;246m<dbl>[39m[23m 3.62, 3.84, 3.23…
+"

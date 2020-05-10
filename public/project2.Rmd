@@ -1,0 +1,247 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "Alyse Gonzalez ag62983"
+date: '05/01/2020'
+output:
+  html_document: default 
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+# 0. Introduction 
+*The two datasets I have chosen were acquired from the website https://vincentarelbundock.github.io/Rdatasets/datasets.html. I chose a dataset titled "GPA and Medical School Admission." I chose to work with this dataset because I will be taking the MCAT in the coming months and hopefully applying to medical school in May. There are 13 variables within this dataset including "ID", corresponding to the unique ID number given to each of the 55 students/observations, MCAT", which signifies MCAT score, "Accept" signfies acceptance to medical school, in which "A" represents acceptance and "D" represents declination, "Acceptance" is represented by a "1" for acceptance and "0" for denial, sex is given by "M" for male and "F" for female, GPA is given on a 4.00 scale, Apps gives the number of applications submitted to medical schools, and finally various components of the MCAT are given by "VR" for verbal reasoning, "PS" for physical sciences, "WS" for writing sample, and "BS" for biological sciences. I was curious to see the differences in acceptance based on things like MCAT score, GPA, sex, etc. Due to the large number of variables in this dataset, I chose to split it into two separate datasets and connect them by ID number. I named my two separated datasets, the first being "midprojectpart1", which contains the variables "ID", "Accept", "Acceptance", "Sex", "BCPM", and "GPA." The second dataset is called "midprojectpart2" and contains the variables "ID", "VR", "PS", "WS", "BS" "MCAT", and "Apps."  I expected to see a correlation between GPA and MCAT scores, MCAT scores and Acceptance, and between GPA and Acceptance. I speculated that females might be more likely to be accepted with slightly lower MCAT and GPA scores than males with similar scores/grades.* 
+
+# 1. Modeling
+```{r}
+library(readxl)
+midprojectpart2 <- read_excel("projectpart2.xlsx")
+midprojectpart1 <- read_excel("projectpart1.xlsx")
+
+joindat<- full_join(midprojectpart1, midprojectpart2)
+glimpse(joindat)
+
+joindatomit<- joindat %>% filter(complete.cases(joindat))
+
+library(tidyverse)
+
+joindatomit
+
+manova_1<-manova(cbind(BCPM, GPA, BS, PS, MCAT, Apps)~Accept, data=joindatomit)
+summary(manova_1)
+summary.aov(manova_1)
+
+pairwise.t.test(joindatomit$BCPM, joindatomit$Accept, p.adj="none")
+
+pairwise.t.test(joindatomit$GPA, joindatomit$Accept, p.adj="none")
+
+pairwise.t.test(joindatomit$BS, joindatomit$Accept, p.adj="none")
+
+pairwise.t.test(joindatomit$PS, joindatomit$Accept, p.adj="none")
+
+pairwise.t.test(joindatomit$MCAT, joindatomit$Accept, p.adj="none")
+
+(1)-(0.95)^11
+
+0.05/11
+```
+*The MANOVA test was performed to determine if any of the numeric variables show a mean difference across levels of my chosen categorical variable, Accept. The MANOVA test revealed p values of less than the alpha of .05 for BCPM, GPA, BS, PS, and MCAT, meaning that they showed a mean difference across levels of Accept. Therefore, 5 univariate ANOVAs were performed to find response(s) showing a mean difference across groups. All 5 variables except for Apps revealed significance. Post-hoc tests were performed using pairwise t tests for the 5 variables. The probability of at least one type I error was calculated to be 0.4311999. The Bonferroni correction was calculated to be 0.004545455.*
+
+*The MANOVA assumptions are random samples and independent observations, multivariate normality of DVs (ANOVA assumes DV normally distributed within each group and MANOVA assumes DVs have multivariate normality), homogeneity of within-group covariance matricies (ANOVA assumes equal variance for DV within each group and MANOVA assumes it for each DV and equal covariance between any two DVs), linear relationships among DVs, no extreme univariate or multivariate outliers, and no multicollinearity. Assumptions for ANOVA include random sample and independent observations, indepdent samples, normal distribution (in each group) or large samples, and equal variance. These were all likely met, aside from linear relationships among DVs.*
+
+#2.Randomization Test
+```{r}
+library(vegan)
+
+joindatomit%>%group_by(Accept)%>%summarize(mean_GPA=mean(GPA))
+
+3.693333-3.409583
+
+rand_dist<-vector()
+
+for(i in 1:5000){
+new<-data.frame(GPA=sample(joindatomit$GPA), Accept=joindatomit$Accept)
+rand_dist[i]<-mean(new[new$Accept=="A",]$GPA)-
+mean(new[new$Accept=="D",]$GPA)}
+
+joindatomit%>%group_by(Accept)%>%
+  summarize(means=mean(GPA))%>%
+  summarize(`mean_diff:`=diff(means))
+
+{hist(rand_dist, main="",ylab=""); abline(v=0.28375, col="red")}
+
+mean(rand_dist>0.28375)*2
+
+```
+*A randomization test was performed by taking 5000 random permutations. The null hypothesis stated that mean GPA is the same for students who were accepted into medical school vs. those who were denied. The alternative hypothesis stated that mean GPA is different for students who were accepted into medical school vs. those who were denied. A histogram was created of the rand_dist. The p-value of the randomization test was found to be 2e-04. Therefore, there is sufficient evidence to conclude that GPA is different between students who were accepted into medical school vs. those who were not. This is what I expected, considering that I would assume that students who are accepted into medical school have higher GPAs than those who are not accepted.*
+
+#3. Linear Regression Model
+```{r}
+library(sandwich)
+library(lmtest)
+
+joindatomit$GPA_c<-joindatomit$GPA-mean(joindatomit$GPA)
+joindatomit$BCPM_c<-joindatomit$BCPM-mean(joindatomit$BCPM)
+
+fit<-lm(MCAT~BCPM_c*GPA_c, data=joindatomit)
+summary(fit)
+
+qplot(x=joindatomit$GPA_c, y=joindatomit$MCAT, color=joindatomit$BCPM_c, data=joindatomit)+stat_smooth(method="lm",se=FALSE, fullrange=TRUE)
+
+resids<-fit$residuals; fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0,col="red")
+
+bptest(fit)
+
+ggplot()+geom_histogram(aes(resids), bins=20)
+ggplot()+geom_qq(aes(sample=resids))+geom_qq_line()
+
+ks.test(resids, "pnorm", sd=sd(resids))
+
+shapiro.test(resids)
+
+summary(fit)$coef[,1:2]
+coeftest(fit,vcov=vcovHC(fit))[,1:2]
+
+(sum((joindatomit$MCAT-mean(joindatomit$MCAT))^2)-sum(fit$residuals^2))/sum((joindatomit$MCAT-mean(joindatomit$MCAT))^2)
+
+joindatomit
+
+```
+*A multiple linear regression model was done to show the effect of the interaction of BCPM_c and GPA_c on overall MCAT score. GPA and BCPM were mean centered because they are numeric and involved in the interaction. The full model with GPA x BCPM is represented by MCAT= 36.0910479 +0.5088933(BCPM_c) + 7.4878577(GPA_c) + 6.2337552(BCPM_c x GPA_c). According to the coefficients, for people with an average GPA and BCPM, predicted MCAT score is 36.0910479.*
+
+*I checked the assumptions of linearity, normality, and homoskedasticitiy. I graphed the residuals, and the heteroskedasticiy and linearity appeared to be normal. 2 Gg plots were created to assess the linearity. Linearity was also normal. Heteroskedasticity robust standard errors were performed. The uncorrected SEs and the corrected SEs are shown. The values only changed very slightly, suggesting that the data was already homoskedastic. Additionally, the ks.test and the shapiro.test were performed as well.*
+
+*My model explains a proportion of 0.2340453 variation in the overall outcome.*
+
+#4. Bootstrap 
+
+```{r}
+
+library(dplyr)
+x=seq(-5,5,length.out = 1000)
+y=1+2*x+rnorm(1000)
+dat1<-data.frame(x,y)
+boot_dat<-sample_frac(dat1)
+
+samp_distn<-replicate(5000, {
+  boot_dat<-sample_frac(joindatomit, replace=T)
+  fit2<-lm(MCAT~BCPM_c*GPA_c, data=boot_dat)
+  coef(fit2)
+})
+samp_distn%>%t%>%as.data.frame%>%summarize_all(sd)
+
+```
+*The original and corrected SEs and uncorrected SEs were very close to each other. However, the SE went up for the interaction of BCPM_c:GPA_c when corrected. After bootstrapping, I can see that these values are also very close, and the interaction standard error lowered slightly.*
+
+#5. Logistic Regression 
+```{r}
+joindatomit2<-joindatomit%>%mutate(y=ifelse(Accept=="A",1,0))
+joindatomit2
+fit3<-glm(y~ GPA + MCAT, data=joindatomit2, family="binomial")
+fit3
+coeftest(fit3)
+exp(coef(fit3))
+
+probs<-predict(fit3, type="response")
+table(predict=as.numeric(probs>.5),truth=joindatomit2$y)%>%addmargins
+
+#accuracy 
+(23+17)/54
+
+#tpr
+(17/24)
+
+#tnr
+(23/30)
+
+#ppv
+(17/24)
+
+odds<-function(p)p/(1-p) 
+p<-seq(0,1,by=.1)
+cbind(p, odds=odds(p))%>%round(4)
+
+logit<-function(p)log(odds(p))
+cbind(p,odds=odds(p),logit=logit(p))%>%round(4)
+
+joindatomit2$logit<-predict(fit3)
+joindatomit2$Accept<-factor(joindatomit$Accept,levels=c("D","A"))
+ggplot(joindatomit2, aes(logit,fill=Accept))+geom_density(alpha=.3)+geom_vline(xintercept=0, lty=2)
+
+library(plotROC)
+ROCplot<-ggplot(joindatomit2)+geom_roc(aes(d=Accept,m=probs),n.cuts=0)
+ROCplot
+calc_auc(ROCplot)
+
+
+class_diag<-function(probs,truth){
+#confuction matrix:calculate accurary, TPR, TNR, PVV
+tab<-table(factor(probs>.5,levels=c("FALSE", "TRUE")),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+#calculated exact AUC
+ord<-order(probs, decreasing=TRUE)
+probs<-probs[ord]; truth<-truth[ord]
+TPR=cumsum(truth)/max(1,sum(truth))
+FPR=cumsum(!truth)/max(1,sum(!truth))
+dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+TPR<-c(0,TPR[!dup],1);FRP<-c(0,FPR[!dup],1)
+n<-length(TPR)
+auc<-sum( ((TPR[-1]+TPR[-n])/2)*(FPR[-1]-FPR[-n]) )
+data.frame(acc,sens,spec,ppv,auc)
+}
+
+class_diag(probs,joindatomit2$y)
+
+
+
+
+```
+*A logistic regression was performed to predict a binary categorical variable, Accept, from two explanatory variables, GPA and MCAT. The coefficients were then exponentiated.*
+
+*The accuracy was found to be 0.7407407, the tpr 0.7083333, the tnr 0.7666667, and the ppv 0.7083333*
+
+*A ggolot was created to plot density of log-odds (logit) by my binary outcome variable, Acceptance.*
+
+*The AUC values were extremely low, suggesting overfitting. This was a poor result.*
+
+#6. LASSO Regression
+
+```{r}
+library(glmnet)
+y<-as.matrix(joindatomit$GPA)
+x<-model.matrix(Acceptance~.,data=joindatomit)[,-1]
+head(x)
+x<-scale(x)
+
+cv<-cv.glmnet(x,y)
+lasso<-glmnet(x,y, lambda=cv$lambda.1se)
+coef(lasso)
+
+```
+*According to this model, GPA is the most predictive variable of medical school acceptance, which would make a lot of sense.*
+
+
+
+
+

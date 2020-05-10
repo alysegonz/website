@@ -1,0 +1,260 @@
+---
+title: "Project 1"
+author: "Alyse Gonzalez ag62983"
+date: "3/1/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+
+<p>###0.Introduction</p>
+<pre class="r"><code>#Data sets
+library(dplyr)
+library(ggplot2)
+
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(fivethirtyeight)
+library(ggplot2)
+library(tibble)
+
+
+library(readxl)
+midprojectpart2 &lt;- read_excel(&quot;projectpart2.xlsx&quot;)
+midprojectpart1 &lt;- read_excel(&quot;projectpart1.xlsx&quot;)
+
+glimpse(midprojectpart1)</code></pre>
+<pre><code>## Observations: 55
+## Variables: 6
+## $ ID         &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,…
+## $ Accept     &lt;chr&gt; &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;…
+## $ Acceptance &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1…
+## $ Sex        &lt;chr&gt; &quot;F&quot;, &quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;, &quot;M&quot;, &quot;M&quot;, &quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;…
+## $ BCPM       &lt;dbl&gt; 3.59, 3.75, 3.24, 3.74, 3.53, 3.59, 3.85, 3.26, 3.74, 3.86…
+## $ GPA        &lt;dbl&gt; 3.62, 3.84, 3.23, 3.69, 3.38, 3.72, 3.89, 3.34, 3.71, 3.89…</code></pre>
+<pre class="r"><code>glimpse(midprojectpart2)</code></pre>
+<pre><code>## Observations: 55
+## Variables: 7
+## $ ID   &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1…
+## $ VR   &lt;dbl&gt; 11, 12, 9, 12, 9, 10, 11, 11, 8, 9, 11, 11, 8, 9, 11, 12, 8, 9, …
+## $ PS   &lt;dbl&gt; 9, 13, 10, 11, 11, 9, 12, 11, 10, 9, 9, 8, 10, 9, 8, 8, 8, 10, 9…
+## $ WS   &lt;dbl&gt; 9, 8, 5, 7, 4, 7, 6, 8, 6, 6, 8, 4, 7, 4, 6, 8, 8, 9, 5, 8, 8, 8…
+## $ BS   &lt;dbl&gt; 9, 12, 9, 10, 11, 10, 11, 9, 11, 10, 11, 8, 10, 10, 7, 10, 11, 1…
+## $ MCAT &lt;dbl&gt; 38, 45, 33, 40, 35, 36, 40, 39, 35, 34, 39, 31, 35, 32, 32, 38, …
+## $ Apps &lt;dbl&gt; 5, 3, 19, 5, 11, 5, 5, 7, 5, 11, 6, 9, 5, 8, 15, 6, 6, 1, 5, 5, …</code></pre>
+<p><em>The two datasets I have chosen were acquired from the website <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html" class="uri">https://vincentarelbundock.github.io/Rdatasets/datasets.html</a>. I chose a dataset titled “GPA and Medical School Admission.” I chose to work with this dataset because I will be taking the MCAT in the coming months and hopefully applying to medical school in May. There are 13 variables within this dataset including “ID”, corresponding to the unique ID number given to each of the 55 students/observations, MCAT“, which signifies MCAT score,”Accept&quot; signfies acceptance to medical school, in which “A” represents acceptance and “D” represents declination, “Acceptance” is represented by a “1” for acceptance and “0” for denial, sex is given by “M” for male and “F” for female, GPA is given on a 4.00 scale, Apps gives the number of applications submitted to medical schools, and finally various components of the MCAT are given by “VR” for verbal reasoning, “PS” for physical sciences, “WS” for writing sample, and “BS” for biological sciences. I was curious to see the differences in acceptance based on things like MCAT score, GPA, sex, etc. Due to the large number of variables in this dataset, I chose to split it into two separate datasets and connect them by ID number. I named my two separated datasets, the first being “midprojectpart1”, which contains the variables “ID”, “Accept”, “Acceptance”, “Sex”, “BCPM”, and “GPA.” The second dataset is called “midprojectpart2” and contains the variables “ID”, “VR”, “PS”, “WS”, “BS” “MCAT”, and “Apps.” I expected to see a correlation between GPA and MCAT scores, MCAT scores and Acceptance, and between GPA and Acceptance. I speculated that females might be more likely to be accepted with slightly lower MCAT and GPA scores than males with similar scores/grades.</em></p>
+<p>###1.Tidying: Rearranging Wide/Long</p>
+<pre class="r"><code>midprojectpart1 &lt;- midprojectpart1
+
+midprojectpart1 &lt;- midprojectpart1 %&gt;%
+  pivot_wider(names_from = &quot;Sex&quot;, values_from = &quot;GPA&quot;) %&gt;%
+  glimpse()</code></pre>
+<pre><code>## Observations: 55
+## Variables: 6
+## $ ID         &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,…
+## $ Accept     &lt;chr&gt; &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;…
+## $ Acceptance &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1…
+## $ BCPM       &lt;dbl&gt; 3.59, 3.75, 3.24, 3.74, 3.53, 3.59, 3.85, 3.26, 3.74, 3.86…
+## $ F          &lt;dbl&gt; 3.62, NA, 3.23, 3.69, 3.38, NA, NA, NA, 3.71, 3.89, 3.97, …
+## $ M          &lt;dbl&gt; NA, 3.84, NA, NA, NA, 3.72, 3.89, 3.34, NA, NA, NA, NA, 3.…</code></pre>
+<pre class="r"><code>midprojectpart1 &lt;- midprojectpart1 %&gt;%
+  pivot_longer(c(&quot;F&quot;,&quot;M&quot;),names_to = &quot;Sex&quot;,values_to = &quot;GPA&quot;, values_drop_na=T ) %&gt;%
+  glimpse()</code></pre>
+<pre><code>## Observations: 55
+## Variables: 6
+## $ ID         &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,…
+## $ Accept     &lt;chr&gt; &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;…
+## $ Acceptance &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1…
+## $ BCPM       &lt;dbl&gt; 3.59, 3.75, 3.24, 3.74, 3.53, 3.59, 3.85, 3.26, 3.74, 3.86…
+## $ Sex        &lt;chr&gt; &quot;F&quot;, &quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;, &quot;M&quot;, &quot;M&quot;, &quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;…
+## $ GPA        &lt;dbl&gt; 3.62, 3.84, 3.23, 3.69, 3.38, 3.72, 3.89, 3.34, 3.71, 3.89…</code></pre>
+<p><em>My datasets were already tidy, so I pivoted wider by making a male and female columns with their corresponding GPAs and then proceeded to pivot longer to condense the male and female columns into one column called “Sex”. This made my data much easier to read. I included values_drop_na=T when I pivoted longer in order to omit the NAs.</em></p>
+<p>###1.Joining/Merging</p>
+<pre class="r"><code>joindat&lt;- full_join(midprojectpart1, midprojectpart2)
+glimpse(joindat)</code></pre>
+<pre><code>## Observations: 55
+## Variables: 12
+## $ ID         &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,…
+## $ Accept     &lt;chr&gt; &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;D&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;…
+## $ Acceptance &lt;dbl&gt; 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1…
+## $ BCPM       &lt;dbl&gt; 3.59, 3.75, 3.24, 3.74, 3.53, 3.59, 3.85, 3.26, 3.74, 3.86…
+## $ Sex        &lt;chr&gt; &quot;F&quot;, &quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;, &quot;M&quot;, &quot;M&quot;, &quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;, &quot;F&quot;…
+## $ GPA        &lt;dbl&gt; 3.62, 3.84, 3.23, 3.69, 3.38, 3.72, 3.89, 3.34, 3.71, 3.89…
+## $ VR         &lt;dbl&gt; 11, 12, 9, 12, 9, 10, 11, 11, 8, 9, 11, 11, 8, 9, 11, 12, …
+## $ PS         &lt;dbl&gt; 9, 13, 10, 11, 11, 9, 12, 11, 10, 9, 9, 8, 10, 9, 8, 8, 8,…
+## $ WS         &lt;dbl&gt; 9, 8, 5, 7, 4, 7, 6, 8, 6, 6, 8, 4, 7, 4, 6, 8, 8, 9, 5, 8…
+## $ BS         &lt;dbl&gt; 9, 12, 9, 10, 11, 10, 11, 9, 11, 10, 11, 8, 10, 10, 7, 10,…
+## $ MCAT       &lt;dbl&gt; 38, 45, 33, 40, 35, 36, 40, 39, 35, 34, 39, 31, 35, 32, 32…
+## $ Apps       &lt;dbl&gt; 5, 3, 19, 5, 11, 5, 5, 7, 5, 11, 6, 9, 5, 8, 15, 6, 6, 1, …</code></pre>
+<p><em>I chose to do a full join because in my case, this joined both the datasets called “midprojectpart1” and “midprojectpart2” by the common variable, ID number, while retaining all of the other variables unique to each data set. This made the data cohesive and very clear to read and understand. My joined dataset was named “joindat” and later renamed “joindatomit” when NAs were removed.</em></p>
+<p>###3.Wrangling</p>
+<pre class="r"><code>joindatomit&lt;- joindat %&gt;% filter(complete.cases(joindat))
+joindat %&gt;% select(GPA, MCAT)</code></pre>
+<pre><code>## # A tibble: 55 x 2
+##      GPA  MCAT
+##    &lt;dbl&gt; &lt;dbl&gt;
+##  1  3.62    38
+##  2  3.84    45
+##  3  3.23    33
+##  4  3.69    40
+##  5  3.38    35
+##  6  3.72    36
+##  7  3.89    40
+##  8  3.34    39
+##  9  3.71    35
+## 10  3.89    34
+## # … with 45 more rows</code></pre>
+<pre class="r"><code>joindat %&gt;% arrange(desc(GPA))</code></pre>
+<pre><code>## # A tibble: 55 x 12
+##       ID Accept Acceptance  BCPM Sex     GPA    VR    PS    WS    BS  MCAT  Apps
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1    11 A               1  4    F      3.97    11     9     8    11    39     6
+##  2    47 A               1  3.98 F      3.97    11    13    10    14    48     6
+##  3    44 A               1  3.98 F      3.94    13     8     8    10    39    12
+##  4    23 A               1  4    M      3.91    10    13     6    12    41    17
+##  5     7 A               1  3.85 M      3.89    11    12     6    11    40     5
+##  6    10 A               1  3.86 F      3.89     9     9     6    10    34    11
+##  7    20 A               1  3.95 M      3.89    13    14     8    13    48     5
+##  8    33 A               1  3.89 F      3.89     8     9     8    10    35     7
+##  9    24 A               1  3.98 M      3.88     9    10     8    12    39    17
+## 10    39 A               1  3.82 F      3.87    10    10     5     9    34    12
+## # … with 45 more rows</code></pre>
+<pre class="r"><code>joindat %&gt;% group_by(Sex, Accept) %&gt;% summarize(mean_Apps=mean(Apps, na.rm=T))</code></pre>
+<pre><code>## # A tibble: 4 x 3
+## # Groups:   Sex [2]
+##   Sex   Accept mean_Apps
+##   &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;
+## 1 F     A           8.56
+## 2 F     D           9.1 
+## 3 M     A           7.5 
+## 4 M     D           8.33</code></pre>
+<pre class="r"><code>joindat %&gt;% mutate_if(is.numeric, round)</code></pre>
+<pre><code>## # A tibble: 55 x 12
+##       ID Accept Acceptance  BCPM Sex     GPA    VR    PS    WS    BS  MCAT  Apps
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1     1 D               0     4 F         4    11     9     9     9    38     5
+##  2     2 A               1     4 M         4    12    13     8    12    45     3
+##  3     3 A               1     3 F         3     9    10     5     9    33    19
+##  4     4 A               1     4 F         4    12    11     7    10    40     5
+##  5     5 A               1     4 F         3     9    11     4    11    35    11
+##  6     6 A               1     4 M         4    10     9     7    10    36     5
+##  7     7 A               1     4 M         4    11    12     6    11    40     5
+##  8     8 D               0     3 M         3    11    11     8     9    39     7
+##  9     9 A               1     4 F         4     8    10     6    11    35     5
+## 10    10 A               1     4 F         4     9     9     6    10    34    11
+## # … with 45 more rows</code></pre>
+<pre class="r"><code>joindat %&gt;% summarize_all(n_distinct)</code></pre>
+<pre><code>## # A tibble: 1 x 12
+##      ID Accept Acceptance  BCPM   Sex   GPA    VR    PS    WS    BS  MCAT  Apps
+##   &lt;int&gt;  &lt;int&gt;      &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1    55      2          2    43     2    40     8     9     8     9    15    17</code></pre>
+<pre class="r"><code>joindatomit %&gt;% group_by(Sex) %&gt;% summarize(sd_MCAT=sd(MCAT), mean_MCAT=mean(MCAT), var_MCAT=var(MCAT), max_MCAT=max(MCAT), min_MCAT=min(MCAT), quan_MCAT=quantile(MCAT, .85), n_dist_MCAT=n_distinct(MCAT), n(), cor_MCAT=cor(Apps, MCAT), median_MCAT=median(MCAT), mad_MCAT=mad(MCAT))</code></pre>
+<pre><code>## # A tibble: 2 x 12
+##   Sex   sd_MCAT mean_MCAT var_MCAT max_MCAT min_MCAT quan_MCAT n_dist_MCAT `n()`
+##   &lt;chr&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+## 1 F        4.13      36.3     17.0       48       27      40            13    28
+## 2 M        4.23      37.0     17.9       48       31      40.2          11    26
+## # … with 3 more variables: cor_MCAT &lt;dbl&gt;, median_MCAT &lt;dbl&gt;, mad_MCAT &lt;dbl&gt;</code></pre>
+<pre class="r"><code>joindatomit %&gt;% group_by(Sex, Accept) %&gt;% summarize(sd_MCAT=sd(MCAT), mean_MCAT=mean(MCAT), var_MCAT=var(MCAT), max_MCAT=max(MCAT), min_MCAT=min(MCAT), quan_MCAT=quantile(MCAT, .85), n_dist_MCAT=n_distinct(MCAT), n(), cor_MCAT=cor(Apps, MCAT), median_MCAT=median(MCAT), mad_MCAT=mad(MCAT))</code></pre>
+<pre><code>## # A tibble: 4 x 13
+## # Groups:   Sex [2]
+##   Sex   Accept sd_MCAT mean_MCAT var_MCAT max_MCAT min_MCAT quan_MCAT
+##   &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 F     A         3.99      37.2    15.9        48       31      40.4
+## 2 F     D         4.01      34.6    16.0        40       27      38.6
+## 3 M     A         4.23      39.3    17.9        48       32      42.4
+## 4 M     D         3.10      34.9     9.61       41       31      39  
+## # … with 5 more variables: n_dist_MCAT &lt;int&gt;, `n()` &lt;int&gt;, cor_MCAT &lt;dbl&gt;,
+## #   median_MCAT &lt;dbl&gt;, mad_MCAT &lt;dbl&gt;</code></pre>
+<pre class="r"><code>joindatomit %&gt;% group_by(Sex) %&gt;% summarize(sd_BCPM=sd(BCPM), mean_BCPM=mean(BCPM), var_BCPM=var(BCPM), max_BCPM=max(BCPM), min_BCPM=min(BCPM), quan_BCPM=quantile(BCPM, .85), n_dist_BCPM=n_distinct(BCPM), n(), cor_BCPM=cor(Apps, BCPM), median_BCPM=median(BCPM), mad_BCPM=mad(BCPM))</code></pre>
+<pre><code>## # A tibble: 2 x 12
+##   Sex   sd_BCPM mean_BCPM var_BCPM max_BCPM min_BCPM quan_BCPM n_dist_BCPM `n()`
+##   &lt;chr&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
+## 1 F       0.295      3.52   0.0868        4     3.08      3.86          23    28
+## 2 M       0.372      3.52   0.139         4     2.41      3.86          23    26
+## # … with 3 more variables: cor_BCPM &lt;dbl&gt;, median_BCPM &lt;dbl&gt;, mad_BCPM &lt;dbl&gt;</code></pre>
+<pre class="r"><code>joindatomit %&gt;% group_by(Sex, Accept) %&gt;% summarize(sd_BCPM=sd(BCPM), mean_BCPM=mean(BCPM), var_BCPM=var(BCPM), max_BCPM=max(BCPM), min_BCPM=min(BCPM), quan_BCPM=quantile(BCPM, .85), n_dist_BCPM=n_distinct(BCPM), n(), cor_BCPM=cor(Apps, BCPM), median_BCPM=median(BCPM), mad_BCPM=mad(BCPM))</code></pre>
+<pre><code>## # A tibble: 4 x 13
+## # Groups:   Sex [2]
+##   Sex   Accept sd_BCPM mean_BCPM var_BCPM max_BCPM min_BCPM quan_BCPM
+##   &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 F     A        0.276      3.63   0.0763     4        3.15      3.93
+## 2 F     D        0.196      3.30   0.0382     3.59     3.08      3.55
+## 3 M     A        0.263      3.70   0.0691     4        3.1       3.96
+## 4 M     D        0.388      3.36   0.151      3.76     2.41      3.73
+## # … with 5 more variables: n_dist_BCPM &lt;int&gt;, `n()` &lt;int&gt;, cor_BCPM &lt;dbl&gt;,
+## #   median_BCPM &lt;dbl&gt;, mad_BCPM &lt;dbl&gt;</code></pre>
+<pre class="r"><code>joindatomit %&gt;% group_by(Sex) %&gt;% summarize(sd_GPA=sd(GPA), mean_GPA=mean(GPA), var_GPA=var(GPA), max_GPA=max(GPA), min_GPA=min(GPA), quan_GPA=quantile(GPA, .85), n_dist_GPA=n_distinct(GPA), n(), cor_GPA=cor(Apps, GPA), median_GPA=median(GPA), mad_GPA=mad(GPA))</code></pre>
+<pre><code>## # A tibble: 2 x 12
+##   Sex   sd_GPA mean_GPA var_GPA max_GPA min_GPA quan_GPA n_dist_GPA `n()`
+##   &lt;chr&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;      &lt;int&gt; &lt;int&gt;
+## 1 F      0.243     3.58  0.0590    3.97    3.09     3.89         21    28
+## 2 M      0.300     3.56  0.0902    3.91    2.72     3.86         22    26
+## # … with 3 more variables: cor_GPA &lt;dbl&gt;, median_GPA &lt;dbl&gt;, mad_GPA &lt;dbl&gt;</code></pre>
+<pre class="r"><code>joindatomit %&gt;% group_by(Sex, Accept) %&gt;% summarize(sd_GPA=sd(GPA), mean_GPA=mean(GPA), var_GPA=var(GPA), max_GPA=max(GPA), min_GPA=min(GPA), quan_GPA=quantile(GPA, .85), n_dist_GPA=n_distinct(GPA), n(), cor_GPA=cor(Apps, GPA), median_GPA=median(GPA), mad_GPA=mad(GPA))</code></pre>
+<pre><code>## # A tibble: 4 x 13
+## # Groups:   Sex [2]
+##   Sex   Accept sd_GPA mean_GPA var_GPA max_GPA min_GPA quan_GPA n_dist_GPA `n()`
+##   &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;      &lt;int&gt; &lt;int&gt;
+## 1 F     A       0.225     3.68  0.0507    3.97    3.23     3.91         15    18
+## 2 F     D       0.162     3.40  0.0261    3.67    3.09     3.56          9    10
+## 3 M     A       0.226     3.72  0.0509    3.91    3.14     3.89         11    12
+## 4 M     D       0.292     3.42  0.0853    3.77    2.72     3.68         14    14
+## # … with 3 more variables: cor_GPA &lt;dbl&gt;, median_GPA &lt;dbl&gt;, mad_GPA &lt;dbl&gt;</code></pre>
+<p><em>The dplyr functions filter, select, arrange, group_by, mutate, and summarize were used on my combined datasets called “joindatomit.” Additionally, I computed the 10 different summary statistics including sd, mean, var, max, min, quantile, n_distinct, cor, median, and mad. I have 8 numeric variables, so I chose to only choose 3 of these variables for generating statistics. I chose to group all of these by one categorical variable,“Sex”, and then by “Sex” and “Accept” together. I chose to generate these summary statistics for MCAT score, BCPM, which is the GPA for Bio/Chem/Physics/Math courses, and GPA. I think these are the most interesting and relevant variables. When grouping by sex, it was intriguing to see which sex had the lower MCAT scores and GPAs and even more interesting when grouping by both sex and accept to see the mean GPA according to who was accepted or not accepted based on sex. Males seem to need a higher GPA than females for acceptance to medical school. The same is true for MCAT score.</em></p>
+<p>###4.Visualizing</p>
+<pre class="r"><code>library(ggplot2)
+
+ggplot(joindatomit, aes(BCPM, GPA)) + geom_point(aes(color=Sex, size=Apps)) +ggtitle(&quot;BCPM vs. GPA According to Sex and Applications Submitted&quot;)+theme_minimal()+ scale_color_brewer(palette=&quot;Dark2&quot;) +scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +scale_y_continuous(breaks = scales::pretty_breaks(n = 10))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(joindatomit, aes(x=Acceptance, y=GPA, fill=Sex)) +geom_bar(stat=&quot;summary&quot;, fun.y=&quot;mean&quot;)+geom_errorbar(stat=&quot;summary&quot;)+ ggtitle(&quot;Acceptance vs. GPA of Pre-med Students&quot;)+theme_dark()+ scale_fill_brewer(palette=&quot;PuBu&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>joindatomit %&gt;% select_if(is.numeric) %&gt;% cor %&gt;% as.data.frame %&gt;% rownames_to_column %&gt;% pivot_longer(-1) %&gt;% ggplot(aes(rowname, name, fill=value)) + geom_tile() + geom_text(aes(label=round(value, 2))) + xlab(&quot;&quot;) + ylab(&quot;&quot;) + scale_fill_gradient2(low=&quot;red&quot;, high=&quot;blue&quot;) +ggtitle(&quot;Correlation Heatmap of Numeric Variables&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" />
+<em>The first vizualization is a scatter plot titled “BCPM vs. GPA According to Sex and Applications Submitted” shows the positive linear relationship of Bio/Chem/Physics/Math grade point average vs. overall GPA for pre-med students, according to sex and the number of applications submitted by students. I can see that GPA depends on BCPM, which would be expected. I can see that students with very high or very low GPA and BCPM submitted more applications that those who are intermediate.</em></p>
+<p><em>The second visualization is a bar plot called “Acceptance vs. GPA of Pre-med Students.” According to this chart, students with an average GPA of less than 3.5 are likely to not be admitted into medical school versus students with average GPAs around 3.75. Additionally, this shows a relatively fair split between males in females both declined and accepted.</em></p>
+<p><em>The third vizualization shows a correlation heatmap of my numeric variables. Through this vizualization, I can see an extremely strong correlation between BCPM and MCAT score. The next strongest association is between physical science (PS) and MCAT. I find this interesting because physical science is one of the harder components of the MCAT, so it’s intriguing to see that those that are successful on the physical sciences section are more likely to do well on the MCAT exam overall. I was surprised to see that there was not a stronger correlation between MCAT and Acceptance or GPA and Acceptance.</em></p>
+<p>###5.Dimensionality Reduction</p>
+<pre class="r"><code>library(cluster)
+library(tidyverse)
+
+pam2&lt;-joindatomit%&gt;%select(-ID, -Accept, -Acceptance, -Sex)%&gt;%pam(3)
+
+sil_width&lt;-vector() 
+for(i in 2:10){
+pam_fit &lt;- joindatomit%&gt;%select(-ID, -Accept, -Acceptance, -Sex)%&gt;%pam(i)
+sil_width[i] &lt;- pam_fit$silinfo$avg.width }
+ggplot()+geom_line(aes(x=1:10,y=sil_width))+scale_x_continuous(name=&quot;k&quot;,breaks=1:10)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>final&lt;-joindatomit%&gt;%mutate(cluster=as.factor(pam2$clustering))
+
+confmat&lt;-final%&gt;%group_by(ID, Accept, Acceptance, Sex)%&gt;%count(cluster)%&gt;%arrange(desc(n))%&gt;%
+pivot_wider(names_from=&quot;cluster&quot;,values_from=&quot;n&quot;,values_fill = list(&#39;n&#39;=0))
+
+confmat</code></pre>
+<pre><code>## # A tibble: 54 x 7
+## # Groups:   ID, Accept, Acceptance, Sex [54]
+##       ID Accept Acceptance Sex     `1`   `2`   `3`
+##    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+##  1     1 D               0 F         1     0     0
+##  2     2 A               1 M         1     0     0
+##  3     3 A               1 F         0     1     0
+##  4     4 A               1 F         1     0     0
+##  5     5 A               1 F         0     1     0
+##  6     6 A               1 M         0     0     1
+##  7     7 A               1 M         1     0     0
+##  8     8 D               0 M         1     0     0
+##  9     9 A               1 F         0     0     1
+## 10    10 A               1 F         0     1     0
+## # … with 44 more rows</code></pre>
+<pre class="r"><code>ggplot(final, aes(x=GPA,y=BCPM, color=cluster))+ ggtitle(&quot;GPA vs. BCPM&quot;)+geom_point()</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(pam2,which=2)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>library(GGally)
+ggpairs(final, columns=5:12, aes(color=cluster))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-4.png" width="672" style="display: block; margin: auto;" />
+<em>I chose to use 3 clusters according to the sil_width graph. My average silhouette width was found to be .32 according to the silhouette plot of pam(x= ., k=3), and according to this value, “the structure is weak and could be artificial.” However, 3 clusters gave me the highest average silhouette width value, so I went with 3. I visualized all pairwise combination of the 8 numeric variables. The correlation of BCPM and GPA was the most impressive. It showed a direct linear correlation between the two variables. This would make sense considering that pre-med students aim to do the best in their science/math courses. Additionally, there was a very unique and distinct correlation between Apps and MCAT. It appears that students who did really poorly on the MCAT submitted very few applications, and the same is true for those who did extremely well on the MCAT. However, those who performed intermediately on the MCAT submitted the most number of applications. This logically makes sense to me because I figure that those who did not do well on the MCAT probably applied to few schools, not expecting to be accepted, and those who did really well proabably had the freedom apply to fewer schools, on the assumption that many schools would accept them based on their MCAT performance. Finally, I can assume that those with intermediate MCAT scores applied to as many places as they could, hoping to get into at least one.</em></p>
