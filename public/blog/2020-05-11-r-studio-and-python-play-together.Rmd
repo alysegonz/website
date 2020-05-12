@@ -1,0 +1,10 @@
+---
+title: 'R Studio and Python Play Together! '
+author: 'Alyse Gonzalez '
+date: '2020-05-11'
+slug: r-studio-and-python-play-together
+categories: []
+tags: []
+description: ''
+---
+
