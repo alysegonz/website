@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "2216927781",
+    "hash" : "1581835133",
     "id" : "F262B335",
-    "lastKnownWriteTime" : 1589266738,
-    "last_content_update" : 1589266738994,
+    "lastKnownWriteTime" : 1589270813,
+    "last_content_update" : 1589270813919,
     "path" : "~/Desktop/website/content/blog/2020-05-11-r-studio-and-python-play-together.Rmd",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "9,0",
-        "scrollLine" : "0"
+        "cursorPosition" : "26,78",
+        "scrollLine" : "22"
     },
     "read_only" : false,
     "read_only_alternatives" : [

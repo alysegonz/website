@@ -72,7 +72,16 @@
               
 
 
-
+<p>Although there is much debate regarding the superiority of R vs. Python, both of these languages can be extremely useful and operate very well. Throughout this SDS 348, we have mostly used R studio but have delved into Python as well. We have even learned that these two languages can be used in coordination with one another using the Reticulate package. This package allows R and Python to play together as exemplified with this riddle below.</p>
+<p>library(reticulate)</p>
+<p>Riddle&lt;-“A boy and his father are in a car accident. The father dies. The son is taken into surgery where the surgeon says, ’I cannot operate on this boy; he is my son…How could this be?”</p>
+<p>Answer=“The surgeon is his mother.”
+print(r.Riddle,Answer)</p>
+<p>A boy and his father are in a car accident. The father dies. The son is taken into surgery where the surgeon says, ’I cannot operate on this boy; he is my son…How could this be? The surgeon is his mother.</p>
+<p>cat(c(Riddle,py$Answer))</p>
+<p>A boy and his father are in a car accident. The father dies. The son is taken into surgery where the surgeon says, ’I cannot operate on this boy; he is my son…How could this be? The surgeon is his mother.</p>
+<p><img src="/blog/2020-05-11-r-studio-and-python-play-together_files/final%20scrren.jpg" /></p>
+<p>I included this riddle in particular because in my last semester at UT, I have been enrolled in an ethics course in which I was presented this riddle. All but one student was stumped by this question, stemming from society’s gender biases, in this case, regarding the gender of surgeons being viewed as solely male. As someone who dreams of being a female physician one day, I hope that in the future women are viewed as just as likely to be physicians as men.</p>
 
               <hr>
               <div class="related-posts">

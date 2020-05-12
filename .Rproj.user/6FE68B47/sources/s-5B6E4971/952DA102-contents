@@ -9,10 +9,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(reticulate)
-hi<-"Hello"
+
+Riddle<-"A boy and his father are in a car accident. The father dies. The son is taken into surgery where the surgeon says, 'I cannot operate on this boy; he is my son...How could this be?"
+
 ```
 
 ```{python}
-hi="world"
-print(r.hi,hi)
+Answer="The surgeon is his mother."
+print(r.Riddle,Answer)
 ```
+```{r}
+cat(c(Riddle,py$Answer))
+```
+
